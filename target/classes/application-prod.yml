@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://ep-frosty-fire-awvd905m.c-12.us-east-1.aws.neon.tech/neondb?sslmode=require
+    url: jdbc:postgresql://ep-frosty-fire-awvd905m-pooler.c-12.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
     username: neondb_owner
     password: npg_YTpoa0zi9VRx
   jpa:
