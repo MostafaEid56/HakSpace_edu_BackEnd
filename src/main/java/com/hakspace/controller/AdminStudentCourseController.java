@@ -16,8 +16,10 @@ public class AdminStudentCourseController {
     private final StudentCourseService studentCourseService;
 
     @GetMapping("/api/admin/courses/{courseId}/students")
-    public ResponseEntity<List<StudentCourseResponse>> getEnrolledStudents(@PathVariable Long courseId) {
-        return ResponseEntity.ok(studentCourseService.getEnrolledStudents(courseId));
+    public ResponseEntity<List<StudentCourseResponse>> getEnrolledStudents(
+            @PathVariable Long courseId,
+            @RequestParam(required = false) Long groupId) {
+        return ResponseEntity.ok(studentCourseService.getEnrolledStudents(courseId, groupId));
     }
 
     @PutMapping("/api/admin/student-courses/{id}/status")

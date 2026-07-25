@@ -27,8 +27,14 @@ public class StudentCourseService {
     private final CourseRepository courseRepo;
     private final CourseGroupRepository groupRepo;
 
-    public List<StudentCourseResponse> getEnrolledStudents(Long courseId) {
-        return studentCourseRepo.findByCourseId(courseId).stream()
+    public List<StudentCourseResponse> getEnrolledStudents(Long courseId, Long groupId) {
+        List<StudentCourse> list;
+        if (groupId != null) {
+            list = studentCourseRepo.findByCourseIdAndGroupId(courseId, groupId);
+        } else {
+            list = studentCourseRepo.findByCourseId(courseId);
+        }
+        return list.stream()
                 .map(StudentCourseResponse::from)
                 .collect(Collectors.toList());
     }

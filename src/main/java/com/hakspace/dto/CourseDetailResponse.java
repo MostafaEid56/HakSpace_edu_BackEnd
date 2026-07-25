@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Enriched course response including all groups with seat availability.
@@ -22,6 +23,7 @@ public class CourseDetailResponse {
     private Double price;
     private Double rating;
     private Integer studentCount;
+    private Integer remainingSeats;
     private List<CourseGroupResponse> groups;
 
     public static CourseDetailResponse from(Course course) {
@@ -39,6 +41,9 @@ public class CourseDetailResponse {
         dto.groups = course.getGroups().stream()
                 .map(CourseGroupResponse::from)
                 .collect(Collectors.toList());
+        dto.remainingSeats = dto.groups.stream()
+                .mapToInt(g -> g.getRemainingSeats() != null ? g.getRemainingSeats() : 0)
+                .sum();
         return dto;
     }
 }
