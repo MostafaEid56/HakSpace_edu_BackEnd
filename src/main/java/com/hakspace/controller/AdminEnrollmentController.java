@@ -17,8 +17,8 @@ public class AdminEnrollmentController {
     private final EnrollmentService enrollmentService;
 
     @GetMapping
-    public ResponseEntity<List<Enrollment>> getAll() {
-        return ResponseEntity.ok(enrollmentService.getAll());
+    public ResponseEntity<List<Enrollment>> getAll(@RequestParam(required = false) Long courseId) {
+        return ResponseEntity.ok(enrollmentService.getAll(courseId));
     }
 
     @PutMapping("/{id}/status")

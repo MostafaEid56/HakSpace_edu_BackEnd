@@ -5,6 +5,9 @@ import com.hakspace.model.Certificate;
 import com.hakspace.model.StudentCourse;
 import com.hakspace.repository.CertificateRepository;
 import com.hakspace.repository.StudentCourseRepository;
+import com.hakspace.repository.UserRepository;
+import com.hakspace.repository.CourseRepository;
+import com.hakspace.repository.CourseGroupRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +23,9 @@ public class StudentCourseService {
 
     private final StudentCourseRepository studentCourseRepo;
     private final CertificateRepository certificateRepo;
+    private final UserRepository userRepo;
+    private final CourseRepository courseRepo;
+    private final CourseGroupRepository groupRepo;
 
     public List<StudentCourseResponse> getEnrolledStudents(Long courseId) {
         return studentCourseRepo.findByCourseId(courseId).stream()
@@ -77,5 +83,31 @@ public class StudentCourseService {
             id = String.format("HSC-%d-%06d", year, nextNum++);
         } while (certificateRepo.findByCertificateId(id).isPresent());
         return id;
+    }
+
+    @Transactional
+    public void removeStudentFromCourse(Long courseId, Long studentId) {
+        if (!userRepo.existsById(studentId)) {
+            throw new RuntimeException("student.not.found");
+        }
+        if (!courseRepo.existsById(courseId)) {
+            throw new RuntimeException("course.not.found");
+        }
+
+        StudentCourse sc = studentCourseRepo.findByStudentIdAndCourseId(studentId, courseId)
+                .orElseThrow(() -> new RuntimeException("student.course.not.found"));
+
+        if (sc.getGroup() != null) {
+            groupRepo.decrementStudentCount(sc.getGroup().getId());
+        }
+
+        if (sc.getCertificate() != null) {
+            Certificate cert = sc.getCertificate();
+            sc.setCertificate(null);
+            studentCourseRepo.saveAndFlush(sc);
+            certificateRepo.delete(cert);
+        }
+
+        studentCourseRepo.delete(sc);
     }
 }

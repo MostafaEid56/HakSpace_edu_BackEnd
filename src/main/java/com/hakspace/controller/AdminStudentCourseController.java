@@ -27,4 +27,12 @@ public class AdminStudentCourseController {
         String status = body.get("status");
         return ResponseEntity.ok(studentCourseService.updateCompletionStatus(id, status));
     }
+
+    @DeleteMapping("/api/admin/courses/{courseId}/students/{studentId}")
+    public ResponseEntity<?> removeStudentFromCourse(
+            @PathVariable Long courseId,
+            @PathVariable Long studentId) {
+        studentCourseService.removeStudentFromCourse(courseId, studentId);
+        return ResponseEntity.ok(Map.of("success", true));
+    }
 }

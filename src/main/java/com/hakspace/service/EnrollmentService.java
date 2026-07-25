@@ -26,7 +26,10 @@ public class EnrollmentService {
     private final StudentCourseRepository studentCourseRepo;
     private final PasswordEncoder passwordEncoder;
 
-    public List<Enrollment> getAll() {
+    public List<Enrollment> getAll(Long courseId) {
+        if (courseId != null) {
+            return enrollmentRepo.findByCourseId(courseId);
+        }
         return enrollmentRepo.findAll();
     }
 
