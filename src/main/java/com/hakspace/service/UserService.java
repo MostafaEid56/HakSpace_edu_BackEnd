@@ -218,6 +218,33 @@ public class UserService {
         return members;
     }
 
+    @Transactional
+    public void recalculateBadge(User student) {
+        if (student == null || student.getId() == null) return;
+        long enrolledCount = studentCourseRepo.countByStudentId(student.getId());
+        if (enrolledCount >= 2) {
+            student.setBadge(User.Badge.GOLD);
+        } else if (enrolledCount == 1) {
+            student.setBadge(User.Badge.BRONZE);
+        } else {
+            student.setBadge(User.Badge.SILVER);
+        }
+        userRepo.save(student);
+    }
+
+    @Transactional
+    public UserResponse updateBadge(Long userId, String rawBadge) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("user.not.found"));
+        try {
+            User.Badge newBadge = User.Badge.valueOf(rawBadge.toUpperCase());
+            user.setBadge(newBadge);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("user.badge.invalid");
+        }
+        return UserResponse.from(userRepo.save(user));
+    }
+
     private UserDashboardResponse.CourseSummary mapToCourseSummary(Course c) {
         UserDashboardResponse.CourseSummary summary = new UserDashboardResponse.CourseSummary();
         summary.setId(c.getId());

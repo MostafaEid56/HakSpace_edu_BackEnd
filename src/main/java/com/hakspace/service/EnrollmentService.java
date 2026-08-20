@@ -25,6 +25,7 @@ public class EnrollmentService {
     private final UserRepository userRepo;
     private final StudentCourseRepository studentCourseRepo;
     private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
     public List<Enrollment> getAll(Long courseId) {
         if (courseId != null) {
@@ -83,6 +84,8 @@ public class EnrollmentService {
                     studentCourse.setEnrollmentDate(LocalDateTime.now());
                     studentCourse.setCompletionStatus(StudentCourse.CompletionStatus.IN_PROGRESS);
                     studentCourseRepo.save(studentCourse);
+
+                    userService.recalculateBadge(student);
                 } else {
                     // Silently ignore or throw exception if already enrolled,
                     // but we MUST NOT increment the student count

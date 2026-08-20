@@ -19,6 +19,7 @@ public class CommunityMemberDTO {
     private String cvUrl;
     private String portfolioUrl;
     private String joinedDate;
+    private User.Badge badge;
     private List<MemberCourse> courses;
 
     @Data
@@ -42,6 +43,7 @@ public class CommunityMemberDTO {
         dto.setBio(user.getBio());
         dto.setCvUrl(user.getCvUrl());
         dto.setPortfolioUrl(user.getPortfolioUrl());
+        dto.setBadge(user.getBadge() != null ? user.getBadge() : User.Badge.SILVER);
         if (user.getCreatedAt() != null) {
             dto.setJoinedDate(user.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         }

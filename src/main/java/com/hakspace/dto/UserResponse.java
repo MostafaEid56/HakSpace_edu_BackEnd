@@ -16,6 +16,7 @@ public class UserResponse {
     private String cvUrl;
     private String portfolioUrl;
     private User.Role role;
+    private User.Badge badge;
 
     public static UserResponse from(User user) {
         UserResponse resp = new UserResponse();
@@ -30,6 +31,7 @@ public class UserResponse {
         resp.setCvUrl(user.getCvUrl());
         resp.setPortfolioUrl(user.getPortfolioUrl());
         resp.setRole(user.getRole());
+        resp.setBadge(user.getBadge() != null ? user.getBadge() : User.Badge.SILVER);
         return resp;
     }
 }

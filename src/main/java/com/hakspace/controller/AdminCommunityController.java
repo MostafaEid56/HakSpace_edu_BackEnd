@@ -21,4 +21,12 @@ public class AdminCommunityController {
             @RequestParam(required = false) String query) {
         return ResponseEntity.ok(userService.getCommunityMembers(specialization, query));
     }
+
+    @PutMapping("/{userId}/badge")
+    public ResponseEntity<com.hakspace.dto.UserResponse> updateBadge(
+            @PathVariable Long userId,
+            @RequestBody java.util.Map<String, String> body) {
+        String badge = body.get("badge");
+        return ResponseEntity.ok(userService.updateBadge(userId, badge));
+    }
 }

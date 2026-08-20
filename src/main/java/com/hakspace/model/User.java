@@ -39,8 +39,12 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
+    @Enumerated(EnumType.STRING)
+    private Badge badge = Badge.SILVER;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public enum Role { USER, ADMIN }
+    public enum Badge { SILVER, BRONZE, GOLD }
 }
