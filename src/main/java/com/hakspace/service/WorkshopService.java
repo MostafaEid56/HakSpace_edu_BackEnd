@@ -60,9 +60,6 @@ public class WorkshopService {
             user = userRepo.findByEmail(req.getEmail()).orElse(null);
         }
 
-        workshop.setCurrentParticipants(workshop.getCurrentParticipants() + 1);
-        workshopRepo.save(workshop);
-
         WorkshopRegistration reg = new WorkshopRegistration();
         reg.setFullName(req.getFullName());
         reg.setPhone(req.getPhone());
@@ -130,12 +127,34 @@ public class WorkshopService {
     public WorkshopRegistration updateRegistrationStatus(Long regId, String statusStr) {
         WorkshopRegistration reg = regRepo.findById(regId)
                 .orElseThrow(() -> new RuntimeException("registration.not_found"));
+        
+        WorkshopRegistration.RegistrationStatus newStatus;
         try {
-            reg.setStatus(WorkshopRegistration.RegistrationStatus.valueOf(statusStr.toUpperCase()));
-            return regRepo.save(reg);
+            newStatus = WorkshopRegistration.RegistrationStatus.valueOf(statusStr.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new RuntimeException("registration.invalid_status");
         }
+
+        WorkshopRegistration.RegistrationStatus oldStatus = reg.getStatus();
+        if (newStatus != oldStatus) {
+            Workshop workshop = reg.getWorkshop();
+            boolean approving = (newStatus == WorkshopRegistration.RegistrationStatus.CONFIRMED && oldStatus != WorkshopRegistration.RegistrationStatus.CONFIRMED);
+            boolean cancelling = (oldStatus == WorkshopRegistration.RegistrationStatus.CONFIRMED && newStatus != WorkshopRegistration.RegistrationStatus.CONFIRMED);
+
+            if (approving) {
+                if (workshop.getCurrentParticipants() >= workshop.getMaxCapacity()) {
+                    throw new RuntimeException("workshop.fully_booked");
+                }
+                workshop.setCurrentParticipants(workshop.getCurrentParticipants() + 1);
+                workshopRepo.save(workshop);
+            } else if (cancelling) {
+                workshop.setCurrentParticipants(Math.max(0, workshop.getCurrentParticipants() - 1));
+                workshopRepo.save(workshop);
+            }
+        }
+
+        reg.setStatus(newStatus);
+        return regRepo.save(reg);
     }
 
     private void mapRequestToEntity(WorkshopRequest req, Workshop w) {

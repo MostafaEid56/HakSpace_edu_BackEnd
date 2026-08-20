@@ -114,6 +114,10 @@ public class UserService {
             wRegs = workshopRegRepo.findByEmail(user.getEmail());
         }
 
+        wRegs = wRegs.stream()
+                .filter(wr -> wr.getStatus() == com.hakspace.model.WorkshopRegistration.RegistrationStatus.CONFIRMED)
+                .collect(Collectors.toList());
+
         List<UserDashboardResponse.WorkshopSummary> inProgressW = new ArrayList<>();
         List<UserDashboardResponse.WorkshopSummary> completedW = new ArrayList<>();
         List<UserDashboardResponse.WorkshopSummary> upcomingW = new ArrayList<>();
