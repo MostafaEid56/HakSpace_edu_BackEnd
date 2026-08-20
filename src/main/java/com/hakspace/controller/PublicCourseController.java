@@ -26,8 +26,10 @@ public class PublicCourseController {
     }
 
     @PostMapping("/enroll")
-    public ResponseEntity<?> enroll(@jakarta.validation.Valid @org.springframework.web.bind.annotation.RequestBody
-                                    com.hakspace.dto.EnrollmentRequest req) {
-        return ResponseEntity.ok(courseService.enroll(req));
+    public ResponseEntity<?> enroll(
+            org.springframework.security.core.Authentication auth,
+            @jakarta.validation.Valid @org.springframework.web.bind.annotation.RequestBody com.hakspace.dto.EnrollmentRequest req) {
+        String login = (auth != null && auth.getName() != null) ? auth.getName() : null;
+        return ResponseEntity.ok(courseService.enroll(req, login));
     }
 }

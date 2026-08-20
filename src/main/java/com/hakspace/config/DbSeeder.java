@@ -19,15 +19,30 @@ public class DbSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Seed admin user
-        if (userRepository.count() == 0) {
-            User admin = new User();
+        // Ensure production admin user exists with original credentials
+        User admin = userRepository.findByEmailOrUsername("admin@Hakss.com")
+                .or(() -> userRepository.findByEmailOrUsername("admin@hakspace.com"))
+                .or(() -> userRepository.findByEmailOrUsername("admin"))
+                .orElse(null);
+
+        if (admin == null) {
+            admin = new User();
             admin.setEmail("admin@Hakss.com");
+            admin.setUsername("admin");
             admin.setPassword(passwordEncoder.encode("Hakss@012Hvv"));
             admin.setFullName("HakSpace Admin");
             admin.setRole(User.Role.ADMIN);
+            admin.setSpecialization("System Administrator");
+            admin.setPhone("01000000000");
+            admin.setBio("HakSpace Platform Administrator");
             userRepository.save(admin);
-            System.out.println("Admin user seeded: admin@hakspace.com / admin123");
+            System.out.println("Admin user seeded with production credentials: admin@Hakss.com / Hakss@012Hvv");
+        } else {
+            // Ensure username is populated for community lookup without altering existing password
+            if (admin.getUsername() == null || admin.getUsername().isBlank()) {
+                admin.setUsername("admin");
+                userRepository.save(admin);
+            }
         }
 
         // Seed courses

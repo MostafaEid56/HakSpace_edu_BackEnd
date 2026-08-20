@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.hakspace.model.User;
+import com.hakspace.repository.UserRepository;
+
 @Service
 @RequiredArgsConstructor
 public class CourseService {
@@ -25,6 +28,7 @@ public class CourseService {
     private final CourseRepository courseRepo;
     private final CourseGroupRepository groupRepo;
     private final EnrollmentRepository enrollmentRepo;
+    private final UserRepository userRepo;
 
     // ── Public ─────────────────────────────────────────────────────────────────
 
@@ -42,6 +46,11 @@ public class CourseService {
 
     @Transactional
     public Enrollment enroll(@Valid EnrollmentRequest req) {
+        return enroll(req, null);
+    }
+
+    @Transactional
+    public Enrollment enroll(@Valid EnrollmentRequest req, String userLogin) {
         Course course = courseRepo.findById(req.getCourseId())
                 .orElseThrow(() -> new RuntimeException("course.not.found"));
 
@@ -62,6 +71,14 @@ public class CourseService {
             }
         }
 
+        User user = null;
+        if (userLogin != null && !userLogin.isBlank()) {
+            user = userRepo.findByEmailOrUsername(userLogin).orElse(null);
+        }
+        if (user == null && req.getEmail() != null) {
+            user = userRepo.findByEmail(req.getEmail()).orElse(null);
+        }
+
         Enrollment enrollment = new Enrollment();
         enrollment.setFullName(req.getFullName());
         enrollment.setPhone(req.getPhone());
@@ -72,6 +89,7 @@ public class CourseService {
         enrollment.setNotes(req.getNotes());
         enrollment.setCourse(course);
         enrollment.setGroup(group);
+        enrollment.setUser(user);
         enrollment.setStatus(Enrollment.LeadStatus.NEW);
 
         return enrollmentRepo.save(enrollment);

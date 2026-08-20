@@ -18,4 +18,7 @@ public interface StudentCourseRepository extends JpaRepository<StudentCourse, Lo
 
     @EntityGraph(attributePaths = {"student", "course", "group", "certificate"})
     List<StudentCourse> findByCourseIdAndGroupId(Long courseId, Long groupId);
+
+    @EntityGraph(attributePaths = {"student", "course", "group", "certificate"})
+    List<StudentCourse> findByStudentId(Long studentId);
 }

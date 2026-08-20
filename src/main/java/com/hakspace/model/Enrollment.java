@@ -30,6 +30,11 @@ public class Enrollment {
     @JoinColumn(name = "course_id")
     private Course course;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonIgnoreProperties({"password", "hibernateLazyInitializer", "handler"})
+    private User user;
+
     /** The group the student applied to. May be null for legacy enrollments. */
     @ManyToOne
     @JoinColumn(name = "group_id")

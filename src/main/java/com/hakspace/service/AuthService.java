@@ -1,5 +1,7 @@
 package com.hakspace.service;
 
+import com.hakspace.dto.RegisterRequest;
+import com.hakspace.dto.UserResponse;
 import com.hakspace.model.User;
 import com.hakspace.repository.UserRepository;
 import com.hakspace.security.JwtService;
@@ -17,6 +19,31 @@ public class AuthService {
     private final PasswordEncoder encoder;
     private final JwtService jwtService;
 
+    public UserResponse registerCommunityMember(RegisterRequest req) {
+        if (userRepo.existsByEmail(req.getEmail())) {
+            throw new RuntimeException("auth.email.exists");
+        }
+        if (req.getUsername() != null && userRepo.existsByUsername(req.getUsername())) {
+            throw new RuntimeException("auth.username.exists");
+        }
+
+        User user = new User();
+        user.setFullName(req.getFullName());
+        user.setUsername(req.getUsername());
+        user.setEmail(req.getEmail());
+        user.setPassword(encoder.encode(req.getPassword()));
+        user.setSpecialization(req.getSpecialization());
+        user.setPhone(req.getPhone());
+        user.setWhatsapp(req.getWhatsapp() != null && !req.getWhatsapp().isBlank() ? req.getWhatsapp() : req.getPhone());
+        user.setBio(req.getBio());
+        user.setCvUrl(req.getCvUrl());
+        user.setPortfolioUrl(req.getPortfolioUrl());
+        user.setRole(User.Role.USER);
+
+        User saved = userRepo.save(user);
+        return UserResponse.from(saved);
+    }
+
     public void register(User user) {
         if (userRepo.existsByEmail(user.getEmail())) {
             throw new RuntimeException("auth.email.exists");
@@ -25,16 +52,18 @@ public class AuthService {
         userRepo.save(user);
     }
 
-    public Map<String, Object> login(String email, String password) {
-        User user = userRepo.findByEmail(email)
+    public Map<String, Object> login(String loginIdentifier, String password) {
+        User user = userRepo.findByEmailOrUsername(loginIdentifier)
                 .orElseThrow(() -> new RuntimeException("auth.credentials.invalid"));
+
         if (!encoder.matches(password, user.getPassword())) {
             throw new RuntimeException("auth.credentials.invalid");
         }
+
         String token = jwtService.generateToken(user.getEmail(), user.getRole().name());
         return Map.of(
                 "token", token,
-                "user", Map.of("id", user.getId(), "role", user.getRole())
+                "user", UserResponse.from(user)
         );
     }
 }
