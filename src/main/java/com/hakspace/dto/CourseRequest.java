@@ -28,6 +28,7 @@ public class CourseRequest {
     private Double price;
     private Double rating;
     private Integer studentCount;
+    private String status; // ACTIVE | IN_PROGRESS | PENDING | COMING_SOON | COMPLETED
 
     @Valid
     private List<GroupRequest> groups = new ArrayList<>();

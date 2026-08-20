@@ -45,6 +45,10 @@ public class CourseService {
         Course course = courseRepo.findById(req.getCourseId())
                 .orElseThrow(() -> new RuntimeException("course.not.found"));
 
+        if (course.getStatus() != Course.CourseStatus.ACTIVE) {
+            throw new RuntimeException("course.enrollment.not_active");
+        }
+
         CourseGroup group = null;
         if (req.getGroupId() != null) {
             group = groupRepo.findById(req.getGroupId())
@@ -159,6 +163,11 @@ public class CourseService {
         course.setPrice(req.getPrice());
         if (req.getRating() != null) course.setRating(req.getRating());
         if (req.getStudentCount() != null) course.setStudentCount(req.getStudentCount());
+        if (req.getStatus() != null) {
+            try {
+                course.setStatus(Course.CourseStatus.valueOf(req.getStatus().toUpperCase()));
+            } catch (IllegalArgumentException ignored) { /* keep existing status */ }
+        }
     }
 
     private List<CourseGroup> buildGroupsFromRequest(CourseRequest req, Course course) {
@@ -172,5 +181,17 @@ public class CourseService {
             g.setIsAvailable(true);
             return g;
         }).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public CourseDetailResponse updateStatus(Long id, String rawStatus) {
+        Course course = courseRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("course.not.found"));
+        try {
+            course.setStatus(Course.CourseStatus.valueOf(rawStatus.toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("course.status.invalid");
+        }
+        return CourseDetailResponse.from(courseRepo.save(course));
     }
 }

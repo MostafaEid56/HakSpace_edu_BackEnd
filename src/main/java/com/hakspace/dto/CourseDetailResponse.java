@@ -24,6 +24,7 @@ public class CourseDetailResponse {
     private Double rating;
     private Integer studentCount;
     private Integer remainingSeats;
+    private String status;
     private List<CourseGroupResponse> groups;
 
     public static CourseDetailResponse from(Course course) {
@@ -38,6 +39,7 @@ public class CourseDetailResponse {
         dto.price = course.getPrice();
         dto.rating = course.getRating();
         dto.studentCount = course.getStudentCount();
+        dto.status = course.getStatus() != null ? course.getStatus().name() : "ACTIVE";
         dto.groups = course.getGroups().stream()
                 .map(CourseGroupResponse::from)
                 .collect(Collectors.toList());

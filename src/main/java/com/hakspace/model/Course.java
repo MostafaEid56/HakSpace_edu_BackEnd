@@ -13,6 +13,8 @@ import java.util.List;
 @Table(name = "courses")
 public class Course {
 
+    public enum CourseStatus { ACTIVE, IN_PROGRESS, PENDING, COMING_SOON, COMPLETED }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,6 +35,10 @@ public class Course {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private CourseStatus status = CourseStatus.ACTIVE;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<CourseGroup> groups = new ArrayList<>();
