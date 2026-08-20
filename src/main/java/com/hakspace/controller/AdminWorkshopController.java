@@ -63,4 +63,10 @@ public class AdminWorkshopController {
         String status = body.get("status");
         return ResponseEntity.ok(workshopService.updateRegistrationStatus(regId, status));
     }
+
+    @DeleteMapping("/registrations/{regId}")
+    public ResponseEntity<?> deleteRegistration(@PathVariable Long regId) {
+        workshopService.deleteRegistration(regId);
+        return ResponseEntity.ok().build();
+    }
 }

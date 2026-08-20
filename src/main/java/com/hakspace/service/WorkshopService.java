@@ -157,6 +157,22 @@ public class WorkshopService {
         return regRepo.save(reg);
     }
 
+    @Transactional
+    public void deleteRegistration(Long regId) {
+        WorkshopRegistration reg = regRepo.findById(regId)
+                .orElseThrow(() -> new RuntimeException("registration.not_found"));
+
+        if (reg.getStatus() == WorkshopRegistration.RegistrationStatus.CONFIRMED) {
+            Workshop workshop = reg.getWorkshop();
+            if (workshop != null) {
+                workshop.setCurrentParticipants(Math.max(0, workshop.getCurrentParticipants() - 1));
+                workshopRepo.save(workshop);
+            }
+        }
+
+        regRepo.delete(reg);
+    }
+
     private void mapRequestToEntity(WorkshopRequest req, Workshop w) {
         w.setTitle(req.getTitle());
         w.setDescription(req.getDescription());

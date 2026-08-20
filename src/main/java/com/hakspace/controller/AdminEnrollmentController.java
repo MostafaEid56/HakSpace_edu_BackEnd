@@ -26,4 +26,10 @@ public class AdminEnrollmentController {
                                                    @RequestBody Map<String, String> body) {
         return ResponseEntity.ok(enrollmentService.updateStatus(id, body.get("status")));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteLead(@PathVariable Long id) {
+        enrollmentService.delete(id);
+        return ResponseEntity.ok().build();
+    }
 }

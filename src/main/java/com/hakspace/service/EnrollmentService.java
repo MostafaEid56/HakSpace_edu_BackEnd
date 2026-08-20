@@ -95,4 +95,16 @@ public class EnrollmentService {
         enrollment.setStatus(newStatus);
         return enrollmentRepo.save(enrollment);
     }
+
+    @Transactional
+    public void delete(Long id) {
+        Enrollment enrollment = enrollmentRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("enrollment.not.found"));
+
+        if (enrollment.getStatus() == LeadStatus.ENROLLED && enrollment.getGroup() != null) {
+            groupRepo.decrementStudentCount(enrollment.getGroup().getId());
+        }
+
+        enrollmentRepo.delete(enrollment);
+    }
 }
