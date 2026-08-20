@@ -11,6 +11,8 @@ import com.hakspace.repository.CourseRepository;
 import com.hakspace.repository.EnrollmentRepository;
 import com.hakspace.repository.StudentCourseRepository;
 import com.hakspace.repository.UserRepository;
+import com.hakspace.repository.WorkshopRegistrationRepository;
+import com.hakspace.repository.WorkshopRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,8 @@ public class UserService {
     private final StudentCourseRepository studentCourseRepo;
     private final EnrollmentRepository enrollmentRepo;
     private final CourseRepository courseRepo;
+    private final WorkshopRegistrationRepository workshopRegRepo;
+    private final WorkshopRepository workshopRepo;
 
     @Transactional(readOnly = true)
     public UserDashboardResponse getUserDashboard(String login) {
@@ -103,6 +107,47 @@ public class UserService {
         resp.setCompletedCourses(completed);
         resp.setUpcomingCourses(upcoming);
         resp.setAvailableCourses(available);
+
+        // ── Workshops Section ──────────────────────────────────────────────────
+        List<com.hakspace.model.WorkshopRegistration> wRegs = workshopRegRepo.findByUserId(user.getId());
+        if (wRegs.isEmpty() && user.getEmail() != null) {
+            wRegs = workshopRegRepo.findByEmail(user.getEmail());
+        }
+
+        List<UserDashboardResponse.WorkshopSummary> inProgressW = new ArrayList<>();
+        List<UserDashboardResponse.WorkshopSummary> completedW = new ArrayList<>();
+        List<UserDashboardResponse.WorkshopSummary> upcomingW = new ArrayList<>();
+        Set<Long> handledWorkshopIds = new HashSet<>();
+
+        for (com.hakspace.model.WorkshopRegistration wr : wRegs) {
+            com.hakspace.model.Workshop w = wr.getWorkshop();
+            if (w == null || handledWorkshopIds.contains(w.getId())) continue;
+            handledWorkshopIds.add(w.getId());
+
+            UserDashboardResponse.WorkshopSummary ws = mapToWorkshopSummary(w);
+            if (wr.getCreatedAt() != null) {
+                ws.setRegistrationDate(wr.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            }
+
+            if (w.getStatus() == com.hakspace.model.Workshop.WorkshopStatus.COMPLETED) {
+                completedW.add(ws);
+            } else if (w.getStatus() == com.hakspace.model.Workshop.WorkshopStatus.IN_PROGRESS) {
+                inProgressW.add(ws);
+            } else {
+                upcomingW.add(ws);
+            }
+        }
+
+        List<com.hakspace.model.Workshop> allWorkshops = workshopRepo.findAll();
+        List<UserDashboardResponse.WorkshopSummary> availableW = allWorkshops.stream()
+                .filter(w -> !handledWorkshopIds.contains(w.getId()))
+                .map(this::mapToWorkshopSummary)
+                .collect(Collectors.toList());
+
+        resp.setInProgressWorkshops(inProgressW);
+        resp.setCompletedWorkshops(completedW);
+        resp.setUpcomingWorkshops(upcomingW);
+        resp.setAvailableWorkshops(availableW);
 
         return resp;
     }
@@ -179,6 +224,25 @@ public class UserService {
         summary.setInstructorName(c.getInstructorName());
         summary.setPrice(c.getPrice());
         summary.setStatus(c.getStatus() != null ? c.getStatus().name() : "ACTIVE");
+        return summary;
+    }
+
+    private UserDashboardResponse.WorkshopSummary mapToWorkshopSummary(com.hakspace.model.Workshop w) {
+        UserDashboardResponse.WorkshopSummary summary = new UserDashboardResponse.WorkshopSummary();
+        summary.setId(w.getId());
+        summary.setTitle(w.getTitle());
+        summary.setDescription(w.getDescription());
+        summary.setImageUrl(w.getImageUrl());
+        summary.setWorkshopDate(w.getWorkshopDate());
+        summary.setStartTime(w.getStartTime());
+        summary.setEndTime(w.getEndTime());
+        summary.setDuration(w.getDuration());
+        summary.setInstructorName(w.getInstructorName());
+        summary.setPrice(w.getPrice());
+        summary.setMaxCapacity(w.getMaxCapacity() != null ? w.getMaxCapacity() : 30);
+        summary.setCurrentParticipants(w.getCurrentParticipants() != null ? w.getCurrentParticipants() : 0);
+        summary.setRemainingSeats(Math.max(0, summary.getMaxCapacity() - summary.getCurrentParticipants()));
+        summary.setStatus(w.getStatus() != null ? w.getStatus().name() : "ACTIVE");
         return summary;
     }
 }

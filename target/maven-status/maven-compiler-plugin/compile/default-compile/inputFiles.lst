@@ -1,4 +1,5 @@
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\repository\BlacklistRepository.java
+D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\repository\WorkshopRepository.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\controller\PublicCertificateController.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\config\LocaleConfig.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\dto\CommunityMemberDTO.java
@@ -7,8 +8,12 @@ D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\service\User
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\config\DbSeeder.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\security\JwtAuthenticationFilter.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\service\EnrollmentService.java
+D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\model\WorkshopRegistration.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\model\Blacklist.java
+D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\dto\WorkshopRequest.java
+D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\dto\WorkshopDetailResponse.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\repository\CourseRepository.java
+D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\service\WorkshopService.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\service\CourseService.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\dto\CourseRequest.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\controller\AdminCourseController.java
@@ -18,10 +23,12 @@ D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\repository\E
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\dto\RegisterRequest.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\config\SecurityConfig.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\dto\UserResponse.java
+D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\dto\WorkshopRegistrationRequest.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\dto\BlacklistRequest.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\repository\StudentCourseRepository.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\exception\GlobalExceptionHandler.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\controller\AdminBlacklistController.java
+D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\controller\AdminWorkshopController.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\security\JwtService.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\service\CertificateService.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\controller\PublicCourseController.java
@@ -30,6 +37,8 @@ D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\model\Course
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\repository\CourseGroupRepository.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\controller\AuthController.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\repository\CertificateRepository.java
+D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\repository\WorkshopRegistrationRepository.java
+D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\model\Workshop.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\dto\CertificateResponse.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\model\Enrollment.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\controller\UserController.java
@@ -42,6 +51,7 @@ D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\dto\CourseDe
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\controller\DashboardController.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\dto\StudentCourseResponse.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\model\User.java
+D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\controller\PublicWorkshopController.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\controller\AdminStudentCourseController.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\HakSpaceApplication.java
 D:\HakSpace_backend\HakSpace_edu_BackEnd\src\main\java\com\hakspace\dto\EnrollmentRequest.java

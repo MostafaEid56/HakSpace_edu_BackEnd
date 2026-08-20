@@ -15,6 +15,7 @@ public class DbSeeder implements CommandLineRunner {
 
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final com.hakspace.repository.WorkshopRepository workshopRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -84,6 +85,41 @@ public class DbSeeder implements CommandLineRunner {
             courseRepository.save(c3);
 
             System.out.println("Default courses seeded successfully.");
+        }
+
+        // Seed workshops
+        if (workshopRepository.count() == 0) {
+            com.hakspace.model.Workshop w1 = new com.hakspace.model.Workshop();
+            w1.setTitle("Generative AI & LLM Fine-Tuning Hands-on Workshop");
+            w1.setDescription("An intensive 1-day workshop covering prompt engineering, RAG architecture, and fine-tuning Open-Source LLMs for enterprise applications.");
+            w1.setImageUrl("https://images.unsplash.com/photo-1677442136019-21780efad99a?auto=format&fit=crop&w=800&q=80");
+            w1.setWorkshopDate("2026-09-15");
+            w1.setStartTime("18:00");
+            w1.setEndTime("21:00");
+            w1.setDuration("3 Hours");
+            w1.setInstructorName("Alex Mercer");
+            w1.setPrice(0.0);
+            w1.setMaxCapacity(30);
+            w1.setCurrentParticipants(12);
+            w1.setStatus(com.hakspace.model.Workshop.WorkshopStatus.ACTIVE);
+            workshopRepository.save(w1);
+
+            com.hakspace.model.Workshop w2 = new com.hakspace.model.Workshop();
+            w2.setTitle("Modern Microservices with Spring Boot & Docker");
+            w2.setDescription("Learn to architect, containerize, and deploy resilient microservices with Spring Cloud, Docker, and Kubernetes.");
+            w2.setImageUrl("https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80");
+            w2.setWorkshopDate("2026-09-22");
+            w2.setStartTime("19:00");
+            w2.setEndTime("22:00");
+            w2.setDuration("3 Hours");
+            w2.setInstructorName("Dr. Sarah Jenkins");
+            w2.setPrice(0.0);
+            w2.setMaxCapacity(25);
+            w2.setCurrentParticipants(5);
+            w2.setStatus(com.hakspace.model.Workshop.WorkshopStatus.COMING_SOON);
+            workshopRepository.save(w2);
+
+            System.out.println("Default workshops seeded successfully.");
         }
     }
 }
