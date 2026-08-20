@@ -17,6 +17,7 @@ public class CertificateService {
     private final CertificateRepository certificateRepo;
     private final BlacklistService blacklistService;
 
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public Object verifyCertificate(String certificateId) {
         Certificate cert = certificateRepo.findByCertificateId(certificateId)
                 .orElseThrow(() -> new RuntimeException("certificate.not.found"));
