@@ -25,6 +25,11 @@ public class CertificateService {
         String studentPhone = cert.getStudent().getEmail();
         Optional<Blacklist> blacklisted = blacklistService.findActiveByPhone(studentPhone);
 
+        // Also check by full name to support name-only blacklist entries
+        if (blacklisted.isEmpty()) {
+            blacklisted = blacklistService.findActiveByName(cert.getStudentName());
+        }
+
         if (blacklisted.isPresent()) {
             return new CertificateBlockedResponse(true, blacklisted.get().getReason());
         }

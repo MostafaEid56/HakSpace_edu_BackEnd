@@ -22,15 +22,23 @@ public class BlacklistService {
 
     @Transactional
     public BlacklistResponse addToBlacklist(@Valid BlacklistRequest req, String adminName) {
-        if (req.getPhoneNumber() != null && !req.getPhoneNumber().isBlank()) {
-            if (blacklistRepo.existsByPhoneNumberAndActiveTrue(req.getPhoneNumber().trim())) {
-                throw new RuntimeException("blacklist.duplicate");
-            }
+        boolean hasName = req.getFullName() != null && !req.getFullName().isBlank();
+        boolean hasPhone = req.getPhoneNumber() != null && !req.getPhoneNumber().isBlank();
+
+        if (!hasName && !hasPhone) {
+            throw new RuntimeException("blacklist.identifier.required");
+        }
+
+        if (hasPhone && blacklistRepo.existsByPhoneNumberAndActiveTrue(req.getPhoneNumber().trim())) {
+            throw new RuntimeException("blacklist.duplicate");
+        }
+        if (hasName && !hasPhone && blacklistRepo.existsByFullNameIgnoreCaseAndActiveTrue(req.getFullName().trim())) {
+            throw new RuntimeException("blacklist.duplicate");
         }
 
         Blacklist entry = new Blacklist();
-        entry.setFullName(req.getFullName().trim());
-        entry.setPhoneNumber(req.getPhoneNumber().trim());
+        entry.setFullName(hasName ? req.getFullName().trim() : null);
+        entry.setPhoneNumber(hasPhone ? req.getPhoneNumber().trim() : null);
         entry.setEmail(req.getEmail() != null && !req.getEmail().isBlank() ? req.getEmail().trim().toLowerCase() : null);
         entry.setNationalId(req.getNationalId() != null ? req.getNationalId().trim() : null);
         entry.setReason(req.getReason().trim());
@@ -62,6 +70,10 @@ public class BlacklistService {
         Blacklist entry = blacklistRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("blacklist.not.found"));
         if (entry.getPhoneNumber() != null && blacklistRepo.existsByPhoneNumberAndActiveTrue(entry.getPhoneNumber())) {
+            throw new RuntimeException("blacklist.duplicate");
+        }
+        if (entry.getPhoneNumber() == null && entry.getFullName() != null
+                && blacklistRepo.existsByFullNameIgnoreCaseAndActiveTrue(entry.getFullName())) {
             throw new RuntimeException("blacklist.duplicate");
         }
         entry.setActive(true);
@@ -102,5 +114,10 @@ public class BlacklistService {
     public Optional<Blacklist> findActiveByPhone(String phone) {
         if (phone == null || phone.isBlank()) return Optional.empty();
         return blacklistRepo.findByPhoneNumberAndActiveTrue(phone.trim());
+    }
+
+    public Optional<Blacklist> findActiveByName(String fullName) {
+        if (fullName == null || fullName.isBlank()) return Optional.empty();
+        return blacklistRepo.findByFullNameIgnoreCaseAndActiveTrue(fullName.trim());
     }
 }

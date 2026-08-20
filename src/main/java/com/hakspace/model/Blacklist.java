@@ -14,10 +14,10 @@ public class Blacklist {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column
     private String fullName;
 
-    @Column(nullable = false)
+    @Column
     private String phoneNumber;
 
     private String email;

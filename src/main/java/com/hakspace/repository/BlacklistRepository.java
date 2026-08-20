@@ -15,6 +15,9 @@ public interface BlacklistRepository extends JpaRepository<Blacklist, Long> {
 
     boolean existsByEmailAndActiveTrue(String email);
     boolean existsByPhoneNumberAndActiveTrue(String phoneNumber);
+    boolean existsByFullNameIgnoreCaseAndActiveTrue(String fullName);
+
+    Optional<Blacklist> findByFullNameIgnoreCaseAndActiveTrue(String fullName);
 
     List<Blacklist> findByFullNameContainingIgnoreCaseOrPhoneNumberContainingIgnoreCase(
             String fullName, String phoneNumber);
