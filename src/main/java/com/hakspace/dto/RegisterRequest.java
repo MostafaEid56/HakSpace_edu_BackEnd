@@ -23,6 +23,10 @@ public class RegisterRequest {
     @NotBlank(message = "specialization.required")
     private String specialization;
 
+    private String generalSpecialization;
+
+    private String specificSpecialization;
+
     @NotBlank(message = "phone.required")
     private String phone;
 
