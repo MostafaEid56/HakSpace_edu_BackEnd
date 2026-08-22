@@ -23,6 +23,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserDashboard(auth.getName()));
     }
 
+    @GetMapping("/profile/{username}")
+    public ResponseEntity<UserDashboardResponse> getPublicProfile(@PathVariable String username) {
+        return ResponseEntity.ok(userService.getUserDashboard(username));
+    }
+
     @PutMapping("/profile")
     public ResponseEntity<UserResponse> updateProfile(Authentication auth, @RequestBody UserResponse req) {
         if (auth == null || auth.getName() == null) {
