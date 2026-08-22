@@ -6,6 +6,7 @@ import java.util.List;
 @Data
 public class UserDashboardResponse {
     private UserResponse profile;
+    private List<CourseSummary> registeredCourses;
     private List<CourseSummary> inProgressCourses;
     private List<CourseSummary> upcomingCourses;
     private List<CourseSummary> completedCourses;

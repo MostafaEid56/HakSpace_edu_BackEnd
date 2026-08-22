@@ -59,16 +59,21 @@ public class EnrollmentService {
             boolean cancelling = (oldStatus == LeadStatus.ENROLLED && newStatus != LeadStatus.ENROLLED);
 
             if (approving) {
-                // Find or create User representing the student using their phone number as the unique identifier
-                User student = userRepo.findByEmail(enrollment.getPhone())
-                        .orElseGet(() -> {
-                            User newUser = new User();
-                            newUser.setEmail(enrollment.getPhone()); // Saving phone in the email field to ensure uniqueness by phone
-                            newUser.setFullName(enrollment.getFullName());
-                            newUser.setPassword(passwordEncoder.encode("123456")); // default password
-                            newUser.setRole(User.Role.USER);
-                            return userRepo.save(newUser);
-                        });
+                User student = enrollment.getUser();
+                if (student == null && enrollment.getEmail() != null) {
+                    student = userRepo.findByEmail(enrollment.getEmail()).orElse(null);
+                }
+                if (student == null && enrollment.getPhone() != null) {
+                    student = userRepo.findByEmail(enrollment.getPhone()).orElse(null);
+                }
+                if (student == null) {
+                    student = new User();
+                    student.setEmail(enrollment.getEmail() != null ? enrollment.getEmail() : enrollment.getPhone());
+                    student.setFullName(enrollment.getFullName());
+                    student.setPassword(passwordEncoder.encode("123456"));
+                    student.setRole(User.Role.USER);
+                    student = userRepo.save(student);
+                }
 
                 // Verify duplicate enrollment before incrementing count
                 if (!studentCourseRepo.existsByStudentIdAndCourseId(student.getId(), enrollment.getCourse().getId())) {
@@ -85,7 +90,12 @@ public class EnrollmentService {
                     studentCourse.setCompletionStatus(StudentCourse.CompletionStatus.IN_PROGRESS);
                     studentCourseRepo.save(studentCourse);
 
-                    userService.recalculateBadge(student);
+                    try {
+                        userService.recalculateBadge(student);
+                    } catch (Exception e) {
+                        // Badge update failure must never break enrollment
+                        System.err.println("[WARN] Badge recalculation failed for student " + student.getId() + ": " + e.getMessage());
+                    }
                 } else {
                     // Silently ignore or throw exception if already enrolled,
                     // but we MUST NOT increment the student count

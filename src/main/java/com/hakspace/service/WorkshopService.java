@@ -60,6 +60,14 @@ public class WorkshopService {
             user = userRepo.findByEmail(req.getEmail()).orElse(null);
         }
 
+        // ── Duplicate registration guard ──────────────────────────────────────
+        if (user != null && regRepo.existsByWorkshopIdAndUserId(workshop.getId(), user.getId())) {
+            throw new RuntimeException("workshop.registration.duplicate");
+        }
+        if (req.getEmail() != null && regRepo.existsByWorkshopIdAndEmail(workshop.getId(), req.getEmail())) {
+            throw new RuntimeException("workshop.registration.duplicate");
+        }
+
         WorkshopRegistration reg = new WorkshopRegistration();
         reg.setFullName(req.getFullName());
         reg.setPhone(req.getPhone());

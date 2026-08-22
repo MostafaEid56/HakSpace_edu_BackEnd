@@ -15,6 +15,7 @@ import com.hakspace.repository.WorkshopRegistrationRepository;
 import com.hakspace.repository.WorkshopRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.format.DateTimeFormatter;
@@ -44,11 +45,18 @@ public class UserService {
         resp.setProfile(UserResponse.from(user));
 
         List<StudentCourse> studentCourses = studentCourseRepo.findByStudentId(user.getId());
+        if (studentCourses.isEmpty() && user.getEmail() != null) {
+            User emailUser = userRepo.findByEmail(user.getEmail()).orElse(null);
+            if (emailUser != null && !emailUser.getId().equals(user.getId())) {
+                studentCourses = studentCourseRepo.findByStudentId(emailUser.getId());
+            }
+        }
         List<Enrollment> enrollments = enrollmentRepo.findByUserId(user.getId());
         if (enrollments.isEmpty() && user.getEmail() != null) {
             enrollments = enrollmentRepo.findByEmail(user.getEmail());
         }
 
+        List<UserDashboardResponse.CourseSummary> registered = new ArrayList<>();
         List<UserDashboardResponse.CourseSummary> inProgress = new ArrayList<>();
         List<UserDashboardResponse.CourseSummary> completed = new ArrayList<>();
         List<UserDashboardResponse.CourseSummary> upcoming = new ArrayList<>();
@@ -75,8 +83,10 @@ public class UserService {
             }
 
             if (sc.getCompletionStatus() == StudentCourse.CompletionStatus.COMPLETED) {
+                summary.setStatus("COMPLETED");
                 completed.add(summary);
             } else {
+                summary.setStatus("IN_PROGRESS");
                 inProgress.add(summary);
             }
         }
@@ -94,7 +104,14 @@ public class UserService {
             if (en.getCreatedAt() != null) {
                 summary.setEnrollmentDate(en.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             }
-            upcoming.add(summary);
+
+            if (en.getStatus() == Enrollment.LeadStatus.ENROLLED) {
+                summary.setStatus("ENROLLED");
+                upcoming.add(summary);
+            } else {
+                summary.setStatus("REGISTERED");
+                registered.add(summary);
+            }
         }
 
         List<Course> allCourses = courseRepo.findAll();
@@ -103,6 +120,7 @@ public class UserService {
                 .map(this::mapToCourseSummary)
                 .collect(Collectors.toList());
 
+        resp.setRegisteredCourses(registered);
         resp.setInProgressCourses(inProgress);
         resp.setCompletedCourses(completed);
         resp.setUpcomingCourses(upcoming);
@@ -218,18 +236,21 @@ public class UserService {
         return members;
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void recalculateBadge(User student) {
         if (student == null || student.getId() == null) return;
-        long enrolledCount = studentCourseRepo.countByStudentId(student.getId());
+        // Re-fetch by ID so this new transaction has a clean, managed entity
+        User managed = userRepo.findById(student.getId()).orElse(null);
+        if (managed == null) return;
+        long enrolledCount = studentCourseRepo.countByStudentId(managed.getId());
         if (enrolledCount >= 2) {
-            student.setBadge(User.Badge.GOLD);
+            managed.setBadge(User.Badge.GOLD);
         } else if (enrolledCount == 1) {
-            student.setBadge(User.Badge.BRONZE);
+            managed.setBadge(User.Badge.BRONZE);
         } else {
-            student.setBadge(User.Badge.SILVER);
+            managed.setBadge(User.Badge.SILVER);
         }
-        userRepo.save(student);
+        userRepo.save(managed);
     }
 
     @Transactional

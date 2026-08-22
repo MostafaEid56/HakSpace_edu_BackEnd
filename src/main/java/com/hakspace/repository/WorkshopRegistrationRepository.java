@@ -8,4 +8,6 @@ public interface WorkshopRegistrationRepository extends JpaRepository<WorkshopRe
     List<WorkshopRegistration> findByWorkshopId(Long workshopId);
     List<WorkshopRegistration> findByUserId(Long userId);
     List<WorkshopRegistration> findByEmail(String email);
+    boolean existsByWorkshopIdAndEmail(Long workshopId, String email);
+    boolean existsByWorkshopIdAndUserId(Long workshopId, Long userId);
 }
