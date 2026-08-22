@@ -178,6 +178,7 @@ public class CourseService {
         course.setCourseMaterialsLink(req.getCourseMaterialsLink());
         course.setDuration(req.getDuration());
         course.setInstructorName(req.getInstructorName());
+        course.setInstructorUsername(req.getInstructorUsername());
         course.setPrice(req.getPrice());
         if (req.getRating() != null) course.setRating(req.getRating());
         if (req.getStudentCount() != null) course.setStudentCount(req.getStudentCount());

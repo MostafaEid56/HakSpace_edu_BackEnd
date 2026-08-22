@@ -30,6 +30,7 @@ public class Course {
     private String courseMaterialsLink;
     private String duration;
     private String instructorName;
+    private String instructorUsername;
     private Double price;
     private Double rating = 0.0;
     private Integer studentCount = 0;

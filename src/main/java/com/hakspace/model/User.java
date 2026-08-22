@@ -42,6 +42,9 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Badge badge = Badge.SILVER;
 
+    @Column(name = "is_instructor")
+    private Boolean isInstructor = false;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 

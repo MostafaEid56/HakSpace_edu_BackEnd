@@ -20,6 +20,7 @@ public class CourseDetailResponse {
     private String courseMaterialsLink;
     private String duration;
     private String instructorName;
+    private String instructorUsername;
     private Double price;
     private Double rating;
     private Integer studentCount;
@@ -41,6 +42,7 @@ public class CourseDetailResponse {
         dto.courseMaterialsLink = course.getCourseMaterialsLink();
         dto.duration = course.getDuration();
         dto.instructorName = course.getInstructorName();
+        dto.instructorUsername = course.getInstructorUsername();
         dto.price = course.getPrice();
         dto.rating = course.getRating();
         dto.studentCount = course.getStudentCount();

@@ -17,6 +17,7 @@ public class UserResponse {
     private String portfolioUrl;
     private User.Role role;
     private User.Badge badge;
+    private Boolean isInstructor;
 
     public static UserResponse from(User user) {
         UserResponse resp = new UserResponse();
@@ -32,6 +33,7 @@ public class UserResponse {
         resp.setPortfolioUrl(user.getPortfolioUrl());
         resp.setRole(user.getRole());
         resp.setBadge(user.getBadge() != null ? user.getBadge() : User.Badge.SILVER);
+        resp.setIsInstructor(Boolean.TRUE.equals(user.getIsInstructor()));
         return resp;
     }
 }

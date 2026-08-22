@@ -25,6 +25,7 @@ public class CourseRequest {
 
     private String duration;
     private String instructorName;
+    private String instructorUsername;
     private Double price;
     private Double rating;
     private Integer studentCount;
