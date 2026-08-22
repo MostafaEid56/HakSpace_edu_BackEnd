@@ -30,6 +30,12 @@ public class CourseRequest {
     private Integer studentCount;
     private String status; // ACTIVE | IN_PROGRESS | PENDING | COMING_SOON | COMPLETED
 
+    private String paymentType; // FULL_PAYMENT | INSTALLMENT
+    private Double downPayment;
+    private Double installmentAmount;
+    private String installmentFrequency;
+    private Integer numberOfInstallments;
+
     @Valid
     private List<GroupRequest> groups = new ArrayList<>();
 

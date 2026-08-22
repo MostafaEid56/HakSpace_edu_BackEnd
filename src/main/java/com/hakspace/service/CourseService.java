@@ -186,6 +186,28 @@ public class CourseService {
                 course.setStatus(Course.CourseStatus.valueOf(req.getStatus().toUpperCase()));
             } catch (IllegalArgumentException ignored) { /* keep existing status */ }
         }
+
+        if (req.getPaymentType() != null) {
+            try {
+                course.setPaymentType(Course.PaymentType.valueOf(req.getPaymentType().toUpperCase()));
+            } catch (IllegalArgumentException ignored) {
+                course.setPaymentType(Course.PaymentType.FULL_PAYMENT);
+            }
+        } else {
+            course.setPaymentType(Course.PaymentType.FULL_PAYMENT);
+        }
+
+        if (course.getPaymentType() == Course.PaymentType.INSTALLMENT) {
+            course.setDownPayment(req.getDownPayment());
+            course.setInstallmentAmount(req.getInstallmentAmount());
+            course.setInstallmentFrequency(req.getInstallmentFrequency());
+            course.setNumberOfInstallments(req.getNumberOfInstallments());
+        } else {
+            course.setDownPayment(null);
+            course.setInstallmentAmount(null);
+            course.setInstallmentFrequency(null);
+            course.setNumberOfInstallments(null);
+        }
     }
 
     private List<CourseGroup> buildGroupsFromRequest(CourseRequest req, Course course) {

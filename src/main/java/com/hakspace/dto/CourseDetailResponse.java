@@ -25,6 +25,11 @@ public class CourseDetailResponse {
     private Integer studentCount;
     private Integer remainingSeats;
     private String status;
+    private String paymentType;
+    private Double downPayment;
+    private Double installmentAmount;
+    private String installmentFrequency;
+    private Integer numberOfInstallments;
     private List<CourseGroupResponse> groups;
 
     public static CourseDetailResponse from(Course course) {
@@ -40,6 +45,11 @@ public class CourseDetailResponse {
         dto.rating = course.getRating();
         dto.studentCount = course.getStudentCount();
         dto.status = course.getStatus() != null ? course.getStatus().name() : "ACTIVE";
+        dto.paymentType = course.getPaymentType() != null ? course.getPaymentType().name() : "FULL_PAYMENT";
+        dto.downPayment = course.getDownPayment();
+        dto.installmentAmount = course.getInstallmentAmount();
+        dto.installmentFrequency = course.getInstallmentFrequency();
+        dto.numberOfInstallments = course.getNumberOfInstallments();
         dto.groups = course.getGroups().stream()
                 .map(CourseGroupResponse::from)
                 .collect(Collectors.toList());

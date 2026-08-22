@@ -14,6 +14,7 @@ import java.util.List;
 public class Course {
 
     public enum CourseStatus { ACTIVE, IN_PROGRESS, PENDING, COMING_SOON, COMPLETED }
+    public enum PaymentType { FULL_PAYMENT, INSTALLMENT }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,6 +33,15 @@ public class Course {
     private Double price;
     private Double rating = 0.0;
     private Integer studentCount = 0;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_type", nullable = false)
+    private PaymentType paymentType = PaymentType.FULL_PAYMENT;
+
+    private Double downPayment;
+    private Double installmentAmount;
+    private String installmentFrequency;
+    private Integer numberOfInstallments;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
