@@ -202,6 +202,12 @@ public class UserService {
         if (req.getFullName() != null && !req.getFullName().isBlank()) {
             user.setFullName(req.getFullName());
         }
+        if (req.getEmail() != null && !req.getEmail().isBlank()) {
+            if (userRepo.existsByEmailAndIdNot(req.getEmail(), user.getId())) {
+                throw new RuntimeException("user.email.duplicate");
+            }
+            user.setEmail(req.getEmail());
+        }
         if (req.getSpecialization() != null) user.setSpecialization(req.getSpecialization());
         if (req.getPhone() != null) user.setPhone(req.getPhone());
         if (req.getWhatsapp() != null) user.setWhatsapp(req.getWhatsapp());
