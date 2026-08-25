@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.hakspace.model.User;
+import com.hakspace.repository.StudentCourseRepository;
 import com.hakspace.repository.UserRepository;
 
 @Service
@@ -29,19 +30,28 @@ public class CourseService {
     private final CourseGroupRepository groupRepo;
     private final EnrollmentRepository enrollmentRepo;
     private final UserRepository userRepo;
+    private final StudentCourseRepository studentCourseRepo;
 
     // ── Public ─────────────────────────────────────────────────────────────────
 
     public List<CourseDetailResponse> getAll() {
         return courseRepo.findAll().stream()
-                .map(CourseDetailResponse::from)
+                .map(course -> {
+                    CourseDetailResponse dto = CourseDetailResponse.from(course);
+                    long enrolledCount = studentCourseRepo.countByCourseId(course.getId());
+                    dto.setStudentCount((int) enrolledCount);
+                    return dto;
+                })
                 .collect(Collectors.toList());
     }
 
     public CourseDetailResponse getById(Long id) {
         Course course = courseRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("course.not.found"));
-        return CourseDetailResponse.from(course);
+        CourseDetailResponse dto = CourseDetailResponse.from(course);
+        long enrolledCount = studentCourseRepo.countByCourseId(course.getId());
+        dto.setStudentCount((int) enrolledCount);
+        return dto;
     }
 
     @Transactional

@@ -63,9 +63,6 @@ public class EnrollmentService {
                 if (student == null && enrollment.getEmail() != null) {
                     student = userRepo.findByEmail(enrollment.getEmail()).orElse(null);
                 }
-                if (student == null && enrollment.getPhone() != null) {
-                    student = userRepo.findByEmail(enrollment.getPhone()).orElse(null);
-                }
                 if (student == null) {
                     student = new User();
                     student.setEmail(enrollment.getEmail() != null ? enrollment.getEmail() : enrollment.getPhone());
