@@ -92,6 +92,10 @@ public class UserService {
         }
 
         for (Enrollment en : enrollments) {
+            if (en.getStatus() == Enrollment.LeadStatus.ENROLLED || en.getStatus() == Enrollment.LeadStatus.CLOSED) {
+                continue;
+            }
+
             Course c = en.getCourse();
             if (c == null || handledCourseIds.contains(c.getId())) continue;
             handledCourseIds.add(c.getId());
@@ -105,13 +109,8 @@ public class UserService {
                 summary.setEnrollmentDate(en.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
             }
 
-            if (en.getStatus() == Enrollment.LeadStatus.ENROLLED) {
-                summary.setStatus("ENROLLED");
-                upcoming.add(summary);
-            } else {
-                summary.setStatus("REGISTERED");
-                registered.add(summary);
-            }
+            summary.setStatus("REGISTERED");
+            registered.add(summary);
         }
 
         List<Course> allCourses = courseRepo.findAll();
