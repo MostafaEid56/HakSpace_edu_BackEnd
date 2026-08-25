@@ -89,6 +89,14 @@ public class CourseService {
             user = userRepo.findByEmail(req.getEmail()).orElse(null);
         }
 
+        // ── Duplicate course registration guard ──────────────────────────────────────
+        if (user != null && enrollmentRepo.existsByUserIdAndCourseId(user.getId(), course.getId())) {
+            throw new RuntimeException("course.enrollment.duplicate");
+        }
+        if (req.getPhone() != null && enrollmentRepo.existsByPhoneAndCourseId(req.getPhone(), course.getId())) {
+            throw new RuntimeException("course.enrollment.duplicate_phone");
+        }
+
         Enrollment enrollment = new Enrollment();
         enrollment.setFullName(req.getFullName());
         enrollment.setPhone(req.getPhone());
