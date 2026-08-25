@@ -23,6 +23,7 @@ public class InstructorService {
     private final InstructorProfileRepository profileRepo;
     private final UserRepository userRepo;
     private final CourseRepository courseRepo;
+    private final ImageStorageService imageStorageService;
 
     // ── Public ─────────────────────────────────────────────────────────────────
 
@@ -77,6 +78,39 @@ public class InstructorService {
                 .orElseThrow(() -> new RuntimeException("user.not.found"));
         user.setIsInstructor(false);
         userRepo.save(user);
+    }
+
+    @Transactional
+    public InstructorProfileResponse uploadProfileImage(Long userId, org.springframework.web.multipart.MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new RuntimeException("image.empty");
+        }
+
+        // Validate size (5MB limit)
+        if (file.getSize() > 5 * 1024 * 1024) {
+            throw new RuntimeException("image.too_large");
+        }
+
+        // Validate content type
+        String contentType = file.getContentType();
+        if (contentType == null || (!contentType.equals("image/jpeg") && !contentType.equals("image/png") && !contentType.equals("image/webp"))) {
+            throw new RuntimeException("image.invalid_format");
+        }
+
+        InstructorProfile profile = profileRepo.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("instructor.not_found"));
+
+        String oldImageUrl = profile.getProfileImageUrl();
+        String newImageUrl = imageStorageService.upload(file);
+
+        profile.setProfileImageUrl(newImageUrl);
+        profileRepo.save(profile);
+
+        if (oldImageUrl != null && !oldImageUrl.isBlank()) {
+            imageStorageService.delete(oldImageUrl);
+        }
+
+        return buildResponse(profile);
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────────

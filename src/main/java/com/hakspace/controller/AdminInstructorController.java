@@ -40,4 +40,11 @@ public class AdminInstructorController {
         instructorService.demoteInstructor(userId);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/{userId}/profile-image")
+    public ResponseEntity<InstructorProfileResponse> uploadProfileImage(
+            @PathVariable Long userId,
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        return ResponseEntity.ok(instructorService.uploadProfileImage(userId, file));
+    }
 }

@@ -17,3 +17,8 @@ jwt:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+cloudinary:
+  cloud-name: ${IMAGE_PROVIDER_CLOUD_NAME:}
+  api-key: ${IMAGE_PROVIDER_API_KEY:}
+  api-secret: ${IMAGE_PROVIDER_API_SECRET:}
