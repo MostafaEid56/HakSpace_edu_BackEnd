@@ -24,8 +24,11 @@ public class UserController {
     }
 
     @GetMapping("/profile/{username}")
-    public ResponseEntity<UserDashboardResponse> getPublicProfile(@PathVariable String username) {
-        return ResponseEntity.ok(userService.getUserDashboard(username));
+    public ResponseEntity<UserDashboardResponse> getPublicProfile(
+            Authentication auth,
+            @PathVariable String username) {
+        String requesterLogin = (auth != null && auth.getName() != null) ? auth.getName() : null;
+        return ResponseEntity.ok(userService.getPublicUserDashboard(username, requesterLogin));
     }
 
     @PutMapping("/profile")

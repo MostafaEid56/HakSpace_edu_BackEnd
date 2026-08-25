@@ -174,6 +174,27 @@ public class UserService {
         return resp;
     }
 
+    @Transactional(readOnly = true)
+    public UserDashboardResponse getPublicUserDashboard(String targetUsername, String requesterLogin) {
+        UserDashboardResponse resp = getUserDashboard(targetUsername);
+        
+        boolean isSelf = false;
+        if (requesterLogin != null && !requesterLogin.isBlank()) {
+            User requester = userRepo.findByEmailOrUsername(requesterLogin).orElse(null);
+            if (requester != null && resp.getProfile() != null && requester.getId().equals(resp.getProfile().getId())) {
+                isSelf = true;
+            }
+        }
+
+        if (!isSelf && resp.getProfile() != null) {
+            resp.getProfile().setPhone(null);
+            resp.getProfile().setWhatsapp(null);
+            resp.getProfile().setEmail(null);
+        }
+
+        return resp;
+    }
+
     @Transactional
     public UserResponse updateProfile(String login, UserResponse req) {
         User user = userRepo.findByEmailOrUsername(login)
