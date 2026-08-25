@@ -8,3 +8,8 @@ spring:
     level:
       org.hibernate.SQL: DEBUG
       org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+cloudinary:
+  cloud-name: dei5cvfef
+  api-key: 973133641513743
+  api-secret: 9fjyJmJMOzYofDaBkwuGexvqysA

@@ -6,3 +6,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+cloudinary:
+  cloud-name: dei5cvfef
+  api-key: 973133641513743
+  api-secret: 9fjyJmJMOzYofDaBkwuGexvqysA
