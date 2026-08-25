@@ -19,6 +19,6 @@ springdoc:
     path: /swagger-ui.html
 
 cloudinary:
-  cloud-name: ${IMAGE_PROVIDER_CLOUD_NAME:}
-  api-key: ${IMAGE_PROVIDER_API_KEY:}
-  api-secret: ${IMAGE_PROVIDER_API_SECRET:}
+  cloud-name: haksc
+  api-key: 176596732677595
+  api-secret: wYrux-6ysBww3T6OlvPEJ1oqUJY
