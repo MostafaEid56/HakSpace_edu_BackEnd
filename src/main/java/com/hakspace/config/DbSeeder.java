@@ -17,9 +17,13 @@ public class DbSeeder implements CommandLineRunner {
     private final UserRepository userRepository;
     private final com.hakspace.repository.WorkshopRepository workshopRepository;
     private final PasswordEncoder passwordEncoder;
+    private final com.hakspace.service.InvitationCodeService invitationCodeService;
 
     @Override
+    @org.springframework.transaction.annotation.Transactional
     public void run(String... args) throws Exception {
+        invitationCodeService.getActiveCode();
+
         // Ensure production admin user exists with original credentials
         User admin = userRepository.findByEmailOrUsername("admin@Hakss.com")
                 .or(() -> userRepository.findByEmailOrUsername("admin@hakspace.com"))

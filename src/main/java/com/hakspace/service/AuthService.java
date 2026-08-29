@@ -18,8 +18,11 @@ public class AuthService {
     private final UserRepository userRepo;
     private final PasswordEncoder encoder;
     private final JwtService jwtService;
+    private final InvitationCodeService invitationCodeService;
 
     public UserResponse registerCommunityMember(RegisterRequest req) {
+        invitationCodeService.validateCode(req.getInvitationCode());
+
         if (userRepo.existsByEmail(req.getEmail())) {
             throw new RuntimeException("auth.email.exists");
         }

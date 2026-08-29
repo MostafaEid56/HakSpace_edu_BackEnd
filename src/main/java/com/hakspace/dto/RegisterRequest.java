@@ -37,4 +37,7 @@ public class RegisterRequest {
     private String cvUrl;
 
     private String portfolioUrl;
+
+    @NotBlank(message = "invitation_code.required")
+    private String invitationCode;
 }
