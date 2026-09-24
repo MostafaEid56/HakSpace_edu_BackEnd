@@ -56,7 +56,6 @@ public class EnrollmentService {
         // ── Seat counter side-effects ─────────────────────────────────────────
         if (groupId != null) {
             boolean approving = (newStatus == LeadStatus.ENROLLED && oldStatus != LeadStatus.ENROLLED);
-            boolean cancelling = (oldStatus == LeadStatus.ENROLLED && newStatus != LeadStatus.ENROLLED);
 
             if (approving) {
                 User student = enrollment.getUser();
@@ -71,6 +70,7 @@ public class EnrollmentService {
                     student.setRole(User.Role.USER);
                     student = userRepo.save(student);
                 }
+                enrollment.setUser(student);
 
                 // Verify duplicate enrollment before incrementing count
                 if (!studentCourseRepo.existsByStudentIdAndCourseId(student.getId(), enrollment.getCourse().getId())) {
@@ -93,12 +93,7 @@ public class EnrollmentService {
                         // Badge update failure must never break enrollment
                         System.err.println("[WARN] Badge recalculation failed for student " + student.getId() + ": " + e.getMessage());
                     }
-                } else {
-                    // Silently ignore or throw exception if already enrolled,
-                    // but we MUST NOT increment the student count
                 }
-            } else if (cancelling) {
-                groupRepo.decrementStudentCount(groupId);
             }
         }
 
@@ -111,10 +106,9 @@ public class EnrollmentService {
         Enrollment enrollment = enrollmentRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("enrollment.not.found"));
 
-        if (enrollment.getStatus() == LeadStatus.ENROLLED && enrollment.getGroup() != null) {
-            groupRepo.decrementStudentCount(enrollment.getGroup().getId());
-        }
-
+        // NOTE: Deleting a Lead record must NEVER decrement the course group student count
+        // or affect the student's enrollment. Once a student is enrolled (StudentCourse created),
+        // the StudentCourse is the independent source of truth for the enrollment.
         enrollmentRepo.delete(enrollment);
     }
 }

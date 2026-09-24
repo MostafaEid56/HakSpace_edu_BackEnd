@@ -24,4 +24,5 @@ public interface StudentCourseRepository extends JpaRepository<StudentCourse, Lo
 
     long countByStudentId(Long studentId);
     long countByCourseId(Long courseId);
+    long countByGroupId(Long groupId);
 }

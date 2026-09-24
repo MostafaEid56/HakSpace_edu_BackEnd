@@ -90,7 +90,8 @@ public class CourseService {
         }
 
         // ── Duplicate course registration guard ──────────────────────────────────────
-        if (user != null && enrollmentRepo.existsByUserIdAndCourseId(user.getId(), course.getId())) {
+        if (user != null && (studentCourseRepo.existsByStudentIdAndCourseId(user.getId(), course.getId())
+                || enrollmentRepo.existsByUserIdAndCourseId(user.getId(), course.getId()))) {
             throw new RuntimeException("course.enrollment.duplicate");
         }
         if (req.getPhone() != null && enrollmentRepo.existsByPhoneAndCourseId(req.getPhone(), course.getId())) {
