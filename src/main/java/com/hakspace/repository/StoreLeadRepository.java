@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StoreLeadRepository extends JpaRepository<StoreLead, Long> {
     Page<StoreLead> findAllByOrderByCreatedAtDesc(Pageable pageable);
+    java.util.List<StoreLead> findByUserId(Long userId);
 }

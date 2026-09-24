@@ -3,12 +3,19 @@ package com.hakspace.service;
 import com.hakspace.dto.CommunityMemberDTO;
 import com.hakspace.dto.UserDashboardResponse;
 import com.hakspace.dto.UserResponse;
+import com.hakspace.model.Certificate;
 import com.hakspace.model.Course;
 import com.hakspace.model.Enrollment;
+import com.hakspace.model.StoreLead;
 import com.hakspace.model.StudentCourse;
 import com.hakspace.model.User;
+import com.hakspace.model.WorkshopRegistration;
+import com.hakspace.repository.CertificateRepository;
+import com.hakspace.repository.CourseGroupRepository;
 import com.hakspace.repository.CourseRepository;
 import com.hakspace.repository.EnrollmentRepository;
+import com.hakspace.repository.InstructorProfileRepository;
+import com.hakspace.repository.StoreLeadRepository;
 import com.hakspace.repository.StudentCourseRepository;
 import com.hakspace.repository.UserRepository;
 import com.hakspace.repository.WorkshopRegistrationRepository;
@@ -35,6 +42,10 @@ public class UserService {
     private final CourseRepository courseRepo;
     private final WorkshopRegistrationRepository workshopRegRepo;
     private final WorkshopRepository workshopRepo;
+    private final CourseGroupRepository groupRepo;
+    private final CertificateRepository certificateRepo;
+    private final InstructorProfileRepository instructorProfileRepo;
+    private final StoreLeadRepository storeLeadRepo;
 
     @Transactional(readOnly = true)
     public UserDashboardResponse getUserDashboard(String login) {
@@ -290,6 +301,82 @@ public class UserService {
             throw new RuntimeException("user.badge.invalid");
         }
         return UserResponse.from(userRepo.save(user));
+    }
+
+    @Transactional
+    public void deleteUser(Long userId, String adminLogin) {
+        User targetUser = userRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("user.not.found"));
+
+        // Guard against self-deletion
+        if (adminLogin != null && (targetUser.getEmail().equalsIgnoreCase(adminLogin)
+                || (targetUser.getUsername() != null && targetUser.getUsername().equalsIgnoreCase(adminLogin)))) {
+            throw new RuntimeException("user.delete.self_not_allowed");
+        }
+
+        // Guard against deleting administrator
+        if (targetUser.getRole() == User.Role.ADMIN) {
+            throw new RuntimeException("user.delete.admin_not_allowed");
+        }
+
+        // 1. Clean up student course enrollments, decrements group student counts, and remove certificates
+        List<StudentCourse> studentCourses = studentCourseRepo.findByStudentId(userId);
+        for (StudentCourse sc : studentCourses) {
+            if (sc.getGroup() != null) {
+                groupRepo.decrementStudentCount(sc.getGroup().getId());
+            }
+            if (sc.getCertificate() != null) {
+                Certificate cert = sc.getCertificate();
+                sc.setCertificate(null);
+                studentCourseRepo.saveAndFlush(sc);
+                certificateRepo.delete(cert);
+            }
+            studentCourseRepo.delete(sc);
+        }
+
+        // Clean up any remaining certificates belonging to this student
+        List<Certificate> remainingCerts = certificateRepo.findByStudentId(userId);
+        for (Certificate cert : remainingCerts) {
+            certificateRepo.delete(cert);
+        }
+
+        // 2. Unlink user from historical course leads (preserves CRM/lead record)
+        List<Enrollment> enrollments = enrollmentRepo.findByUserId(userId);
+        for (Enrollment en : enrollments) {
+            en.setUser(null);
+            enrollmentRepo.save(en);
+        }
+
+        // 3. Unlink user from workshop registrations (preserves attendee history)
+        List<WorkshopRegistration> workshopRegistrations = workshopRegRepo.findByUserId(userId);
+        for (WorkshopRegistration wr : workshopRegistrations) {
+            wr.setUser(null);
+            workshopRegRepo.save(wr);
+        }
+
+        // 4. Unlink user from store leads / purchase orders (preserves order history)
+        List<StoreLead> storeLeads = storeLeadRepo.findByUserId(userId);
+        for (StoreLead sl : storeLeads) {
+            sl.setUser(null);
+            storeLeadRepo.save(sl);
+        }
+
+        // 5. Delete instructor profile if user was an instructor
+        instructorProfileRepo.findByUserId(userId).ifPresent(instructorProfileRepo::delete);
+
+        // 6. Clear instructorUsername on any courses where targetUser was assigned
+        if (targetUser.getUsername() != null) {
+            List<Course> instructorCourses = courseRepo.findAll().stream()
+                    .filter(c -> targetUser.getUsername().equalsIgnoreCase(c.getInstructorUsername()))
+                    .collect(Collectors.toList());
+            for (Course c : instructorCourses) {
+                c.setInstructorUsername(null);
+                courseRepo.save(c);
+            }
+        }
+
+        // 7. Permanently delete the user from the community/system
+        userRepo.delete(targetUser);
     }
 
     private UserDashboardResponse.CourseSummary mapToCourseSummary(Course c) {

@@ -29,4 +29,16 @@ public class AdminCommunityController {
         String badge = body.get("badge");
         return ResponseEntity.ok(userService.updateBadge(userId, badge));
     }
+
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<?> removeUserFromCommunity(
+            @PathVariable Long userId,
+            org.springframework.security.core.Authentication auth) {
+        String adminLogin = (auth != null) ? auth.getName() : null;
+        userService.deleteUser(userId, adminLogin);
+        return ResponseEntity.ok(java.util.Map.of(
+                "success", true,
+                "message", "user.delete.success"
+        ));
+    }
 }
